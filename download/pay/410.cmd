@@ -5,7 +5,7 @@ set kmsserver=kms.jihuowin.com
 
 cls
 echo.
-echo. [ 比永久更久 Windows10/11 系统激活410年 ]
+echo. [ Windows 10/11 system activated for 410 years ]
 echo -------------------------------------------------
 
 :: 尝试获取管理员权限
@@ -14,10 +14,10 @@ net session >nul 2>&1
 :: 判断是否有管理员权限
 if %errorlevel% neq 0 (
     echo.
-    echo. 需要管理员权限，请在弹出的确认框内点 "是" !
-    echo. 终止执行，请点"否"。
+    echo. Administrator privileges required. Please click "Yes" in the confirmation dialog!
+    echo. To cancel the execution, please click "No".
     echo.
-    echo. 按任意键 请求授权 ...
+    echo. Press any key to request authorization ...
     pause 1>nul 2>nul
 )
 ::获取管理员权限
@@ -31,10 +31,10 @@ expand -r -F:* %skudir%\EnterpriseG.cer %skudir%\ 1>nul 2>nul
 del /s /f /q %skudir%\EnterpriseG.cer 1>nul 2>nul
 
 echo.
-echo. 1.正在安装证书 !
+echo. 1. Installing certificate!
 echo -------------------------------------------------
 echo.
-echo. 执行时间较长，耐心等待即可 ...
+echo. This process may take a while. Please be patient ...
 echo.
 
 %windir%\System32\cscript.exe //nologo %windir%\System32\slmgr.vbs /rilc 1>nul 2>nul
@@ -45,7 +45,7 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Pro
 %windir%\System32\cscript.exe //nologo %windir%\System32\slmgr.vbs /skms %kmsserver% 1>nul 2>nul
 
 echo.
-echo. 2.正在激活系统 !
+echo. 2. Activating the system!
 echo -------------------------------------------------
 echo.
 
@@ -59,7 +59,7 @@ reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtection
 
 echo -------------------------------------------------
 echo.
-echo. 操作完成，在弹框中查看激活详情 !
+echo. Operation completed. Check activation details in the popup dialog!
 cd %USERPROFILE%
 echo.
 timeout 10
@@ -70,7 +70,7 @@ exit
 
 :error
 echo.
-echo. 错误，终止执行。请在弹出授权框内点 "是" !
+echo. Error, execution terminated. Please click "Yes" in the authorization popup!
 echo -------------------------------------------------
 cd %USERPROFILE%
 timeout 10
