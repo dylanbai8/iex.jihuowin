@@ -1,21 +1,46 @@
-# 检查系统是否为 Volume 批量授权版（VOL），是否支持 KMS 激活
+# 检查系统是否为 VOL 版本、是否安装GVLK、是否已激活
 
-# 创建临时文件保存输出
+# 临时文件路径
 $tmpFile = "$env:TEMP\slmgr_dlv_output.txt"
 
-# 执行 slmgr /dlv 命令，并重定向输出到临时文件
+# 执行 slmgr /dlv 命令，将结果输出到临时文件
 cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv > $tmpFile
 
-# 读取文件内容
+# 读取输出内容
 $content = Get-Content $tmpFile -Raw
-
-# 检查 Description 中是否包含 "VOLUME"
-if ($content -match "Description:\s+.*VOLUME") {
-    Write-Host "✅ 当前系统是 VOL 版本，支持 KMS 激活。" -ForegroundColor Green
-} else {
-    Write-Host "❌ 当前系统不是 VOL 版本，不支持 KMS 激活。" -ForegroundColor Red
-}
 
 # 删除临时文件
 Remove-Item $tmpFile -Force
+
+# 1. 判断是否为VOL版（是否包含 VOLUME）
+$volCheck = if ($content -match "Description:\s+.*VOLUME") { $true } else { $false }
+
+# 2. 判断是否已安装GVLK（通用KMS密钥），GVLK通常出现在 Description 或 Product Key Channel 中
+$gvlkCheck = if ($content -match "GVLK") { $true } else { $false }
+
+# 3. 判断激活状态（Licensed表示已激活）
+$activationStatus = if ($content -match "License Status:\s+Licensed") { "已激活" } else { "未激活" }
+
+# 显示结果
+Write-Host "==================== 系统激活检查 ===================="
+
+if ($volCheck) {
+    Write-Host "✅ 当前系统是 VOL 版本（支持 KMS 激活）" -ForegroundColor Green
+} else {
+    Write-Host "❌ 当前系统不是 VOL 版本（不支持 KMS 激活）" -ForegroundColor Red
+}
+
+if ($gvlkCheck) {
+    Write-Host "✅ 已安装 GVLK 密钥（默认 KMS 密钥）" -ForegroundColor Green
+} else {
+    Write-Host "⚠️ 未检测到 GVLK 密钥" -ForegroundColor Yellow
+}
+
+if ($activationStatus -eq "已激活") {
+    Write-Host "✅ 系统已激活" -ForegroundColor Green
+} else {
+    Write-Host "❌ 系统未激活" -ForegroundColor Red
+}
+
+Write-Host "======================================================"
 
