@@ -25,21 +25,21 @@ $activationStatus = if ($content -match "License Status:\s+Licensed") { "已激�
 Write-Host "==================== 系统激活检查 ===================="
 
 if ($volCheck) {
-    Write-Host "✅ 当前系统是 VOL 版本（支持 KMS 激活）" -ForegroundColor Green
+    Write-Host "当前系统是 VOL 版本（支持 KMS 激活）" -ForegroundColor Green
 } else {
-    Write-Host "❌ 当前系统不是 VOL 版本（不支持 KMS 激活）" -ForegroundColor Red
+    Write-Host "当前系统不是 VOL 版本（不支持 KMS 激活）" -ForegroundColor Red
 }
 
 if ($gvlkCheck) {
-    Write-Host "✅ 已安装 GVLK 密钥（默认 KMS 密钥）" -ForegroundColor Green
+    Write-Host "已安装 GVLK 密钥（默认 KMS 密钥）" -ForegroundColor Green
 } else {
-    Write-Host "⚠️ 未检测到 GVLK 密钥" -ForegroundColor Yellow
+    Write-Host "未检测到 GVLK 密钥" -ForegroundColor Yellow
 }
 
 if ($activationStatus -eq "已激活") {
-    Write-Host "✅ 系统已激活" -ForegroundColor Green
+    Write-Host "系统已激活" -ForegroundColor Green
 } else {
-    Write-Host "❌ 系统未激活" -ForegroundColor Red
+    Write-Host "系统未激活" -ForegroundColor Red
 }
 
 Write-Host "======================================================"
