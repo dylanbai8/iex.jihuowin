@@ -2,7 +2,7 @@
 $ErrorActionPreference = "SilentlyContinue"
 
 # 定义变量
-$downloadUrl = "https://iex.jihuowin.com/download/dism.exe"
+$downloadUrl = "https://iex.jihuowin.com/download/tool/dism.exe"
 $outputPath = "$Env:USERPROFILE\Downloads\dism.exe"
 
 # 下载 EXE 文件
