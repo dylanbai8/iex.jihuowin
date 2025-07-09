@@ -4,8 +4,10 @@ set self="%~f0"
 set user=%USERPROFILE%
 cd %user%
 
-set exe_url=https://gitee.com/dylanbai8/download/releases/download/21.0/setup.exe
-set config_url=https://gitee.com/dylanbai8/download/releases/download/22.0/config_full.xml
+:: set exe_url=https://gitee.com/dylanbai8/download/releases/download/21.0/setup.exe
+:: set config_url=https://gitee.com/dylanbai8/download/releases/download/22.0/config_full.xml
+set exe_url=https://iex.jihuowin.com/download/office/setup.exe
+set config_url=https://iex.jihuowin.com/download/office/config_2021.xml
 
 cls
 echo.
