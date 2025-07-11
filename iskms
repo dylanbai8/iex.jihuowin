@@ -13,7 +13,7 @@ $gvlkCheck = $content -match 'GVLK'
 # ========= 3. Check Activation Status =========
 # Match Chinese or English fields that indicate "Licensed"
 $activationStatus = if (
-    $content -match '许可证状态：\s*已许可' -or
+    $content -match '许可证状态：\s*已授权' -or
     $content -match 'License Status:\s*Licensed'
 ) {
     "Activated"
@@ -25,21 +25,21 @@ $activationStatus = if (
 Write-Host "============ System Activation Check ============"
 
 if ($volCheck) {
-    Write-Host "✅ This system is a VOL (Volume License) edition and supports KMS activation." -ForegroundColor Green
+    Write-Host "This system is a VOL (Volume License) edition and supports KMS activation." -ForegroundColor Green
 } else {
-    Write-Host "❌ This system is NOT a VOL (Volume License) edition and does NOT support KMS activation." -ForegroundColor Red
+    Write-Host "This system is NOT a VOL (Volume License) edition and does NOT support KMS activation." -ForegroundColor Red
 }
 
 if ($gvlkCheck) {
-    Write-Host "✅ GVLK key (default KMS key) is installed." -ForegroundColor Green
+    Write-Host "GVLK key (default KMS key) is installed." -ForegroundColor Green
 } else {
-    Write-Host "⚠️ GVLK key is not detected." -ForegroundColor Yellow
+    Write-Host "GVLK key is not detected." -ForegroundColor Yellow
 }
 
 if ($activationStatus -eq "Activated") {
-    Write-Host "✅ The system is activated." -ForegroundColor Green
+    Write-Host "The system is activated." -ForegroundColor Green
 } else {
-    Write-Host "❌ The system is not activated." -ForegroundColor Red
+    Write-Host "The system is not activated." -ForegroundColor Red
 }
 
 Write-Host "================================================="
