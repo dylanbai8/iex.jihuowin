@@ -91,10 +91,10 @@ if ($isAdmin.IsInRole($adminRole)) {
         # Set-FolderPermissions -FolderPath $schedulerPath
     # }
 
-    Write-Host "Disable adding any startup programs."
+    Write-Host "Operation successful, adding any programs to startup has been disabled."
 
 } else {
-    Write-Warning "Please run Powershell as administrator."
+    Write-Warning "Please run Powershell as administrator. Warning: This operation is irreversible!"
 }
 
 
