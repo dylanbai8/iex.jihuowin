@@ -1,36 +1,27 @@
-# Get slmgr /dlv output (supporting both English and Chinese systems)
+# Get slmgr /dlv output
 $content = cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv 2>&1
 $content = $content -join "`n"
 
-# ========== Check if VOL edition ==========
-$volCheck = $false
-if (
-    $content -match '描述：\s*.*VOLUME' -or
-    $content -match 'Description:\s*.*VOLUME'
-) {
-    $volCheck = $true
-}
+# ========= 1. Check for VOL (Volume License) =========
+# Just check if "VOLUME" appears anywhere
+$volCheck = $content -match 'VOLUME'
 
-# ========== Check if GVLK is installed ==========
-$gvlkCheck = $false
-if (
-    $content -match '产品密钥通道：\s*.*GVLK' -or
-    $content -match 'Product Key Channel:\s*.*GVLK' -or
-    $content -match 'GVLK'
-) {
-    $gvlkCheck = $true
-}
+# ========= 2. Check for GVLK key =========
+# If "GVLK" appears anywhere in the output
+$gvlkCheck = $content -match 'GVLK'
 
-# ========== Check activation status ==========
-$activationStatus = "Not Activated"
-if (
+# ========= 3. Check Activation Status =========
+# Match Chinese or English fields that indicate "Licensed"
+$activationStatus = if (
     $content -match '许可证状态：\s*已许可' -or
     $content -match 'License Status:\s*Licensed'
 ) {
-    $activationStatus = "Activated"
+    "Activated"
+} else {
+    "Not Activated"
 }
 
-# ========== Display result ==========
+# ========= 4. Display Results =========
 Write-Host "============ System Activation Check ============"
 
 if ($volCheck) {
