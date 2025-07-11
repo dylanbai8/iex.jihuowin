@@ -1,46 +1,54 @@
-# 检查系统是否为 VOL 版本、是否安装GVLK、是否已激活
+# Get slmgr /dlv output (supporting both English and Chinese systems)
+$content = cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv 2>&1
+$content = $content -join "`n"
 
-# 临时文件路径
-$tmpFile = "$env:TEMP\slmgr_dlv_output.txt"
+# ========== Check if VOL edition ==========
+$volCheck = $false
+if (
+    $content -match '描述：\s*.*VOLUME' -or
+    $content -match 'Description:\s*.*VOLUME'
+) {
+    $volCheck = $true
+}
 
-# 执行 slmgr /dlv 命令，将结果输出到临时文件
-cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv > $tmpFile
+# ========== Check if GVLK is installed ==========
+$gvlkCheck = $false
+if (
+    $content -match '产品密钥通道：\s*.*GVLK' -or
+    $content -match 'Product Key Channel:\s*.*GVLK' -or
+    $content -match 'GVLK'
+) {
+    $gvlkCheck = $true
+}
 
-# 读取输出内容
-$content = Get-Content $tmpFile -Raw
+# ========== Check activation status ==========
+$activationStatus = "Not Activated"
+if (
+    $content -match '许可证状态：\s*已许可' -or
+    $content -match 'License Status:\s*Licensed'
+) {
+    $activationStatus = "Activated"
+}
 
-# 删除临时文件
-Remove-Item $tmpFile -Force
-
-# 1. 判断是否为VOL版（是否包含 VOLUME）
-$volCheck = if ($content -match "Description:\s+.*VOLUME") { $true } else { $false }
-
-# 2. 判断是否已安装GVLK（通用KMS密钥），GVLK通常出现在 Description 或 Product Key Channel 中
-$gvlkCheck = if ($content -match "GVLK") { $true } else { $false }
-
-# 3. 判断激活状态（Licensed表示已激活）
-$activationStatus = if ($content -match "License Status:\s+Licensed") { "已激活" } else { "未激活" }
-
-# 显示结果
+# ========== Display result ==========
 Write-Host "============ System Activation Check ============"
 
 if ($volCheck) {
-    Write-Host "The current system is a VOL (Volume License) edition, which supports KMS activation." -ForegroundColor Green
+    Write-Host "✅ This system is a VOL (Volume License) edition and supports KMS activation." -ForegroundColor Green
 } else {
-    Write-Host "The current system is not a VOL (Volume License) edition and does not support KMS activation." -ForegroundColor Red
+    Write-Host "❌ This system is NOT a VOL (Volume License) edition and does NOT support KMS activation." -ForegroundColor Red
 }
 
 if ($gvlkCheck) {
-    Write-Host "GVLK key (default KMS key) is installed." -ForegroundColor Green
+    Write-Host "✅ GVLK key (default KMS key) is installed." -ForegroundColor Green
 } else {
-    Write-Host "No GVLK key detected." -ForegroundColor Yellow
+    Write-Host "⚠️ GVLK key is not detected." -ForegroundColor Yellow
 }
 
-if ($activationStatus -eq "已激活") {
-    Write-Host "The system is activated." -ForegroundColor Green
+if ($activationStatus -eq "Activated") {
+    Write-Host "✅ The system is activated." -ForegroundColor Green
 } else {
-    Write-Host "The system is not activated." -ForegroundColor Red
+    Write-Host "❌ The system is not activated." -ForegroundColor Red
 }
 
-Write-Host "======================================================"
-
+Write-Host "================================================="
