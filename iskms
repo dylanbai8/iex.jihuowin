@@ -1,14 +1,5 @@
-# Set temp file
-$tmpFile = "$env:TEMP\slmgr_dlv_output.txt"
-
-# Redirect slmgr output to file
-cmd /c "cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv > `"$tmpFile`""
-
-# Read using correct encoding (most Chinese systems use GB2312 or Default)
-$content = Get-Content $tmpFile -Encoding Default -Raw
-
-# Clean up
-Remove-Item $tmpFile -Force
+$output = & cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv
+$content = $output -join "`n"
 
 # ========= 1. Check for VOL (Volume License) =========
 # Just check if "VOLUME" appears anywhere
