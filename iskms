@@ -1,34 +1,13 @@
-# 获取 slmgr.vbs 输出到文件
-$tmpFile = "$env:TEMP\slmgr_output.txt"
-cmd /c "cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv > `"$tmpFile`""
-
-# 读取并清除不可见字符
-$content = Get-Content $tmpFile -Encoding Default -Raw
-$content = $content -replace '[\u200E\u200F\uFEFF]', ''
-
-# 删除临时文件
-Remove-Item $tmpFile -Force
+$content = cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv 2>&1
+$content = $content -join "`n"
 
 # ========= 1. Check for VOL (Volume License) =========
-# Just check if "VOLUME" appears anywhere
 $volCheck = $content -match 'VOLUME'
 
 # ========= 2. Check for GVLK key =========
-# If "GVLK" appears anywhere in the output
 $gvlkCheck = $content -match 'GVLK'
 
-# ========= 3. Check Activation Status =========
-# Match Chinese or English fields that indicate "Licensed"
-$activationStatus = if (
-    $content -match '已授权' -or
-    $content -match 'Licensed'
-) {
-    "Activated"
-} else {
-    "Not Activated"
-}
-
-# ========= 4. Display Results =========
+# ========= 3. Display Results =========
 Write-Host "============ System Activation Check ============"
 
 if ($volCheck) {
@@ -43,11 +22,4 @@ if ($gvlkCheck) {
     Write-Host "2.GVLK key is not detected." -ForegroundColor Yellow
 }
 
-if ($activationStatus -eq "Activated") {
-    Write-Host "3.The system is activated." -ForegroundColor Green
-} else {
-    Write-Host "3.The system is not activated." -ForegroundColor Red
-}
-
-Write-Host "Tips: Activation status check only supports systems with the language set to Chinese or English."
 Write-Host "================================================="
