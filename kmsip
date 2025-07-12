@@ -1,11 +1,9 @@
-# Set UTF-8 encoding for console output (optional)
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-
 # Get current path
 $currentPath = (Get-Location).Path
+
 # Input and output file paths
-$inputFile = Join-Path -Path $currentPath -ChildPath "domain.txt"
-$outputFile = Join-Path -Path $currentPath -ChildPath "cloudflare_import.txt"
+$inputFile = Join-Path -Path $currentPath -ChildPath "domain_list.txt"
+$outputFile = Join-Path -Path $currentPath -ChildPath "outip_list.txt" # cloudflare_import.txt
 
 # Prompt
 Write-Host "`n===> Input file: $inputFile"
@@ -48,7 +46,8 @@ foreach ($domain in $domains) {
             # Attempt to connect to port 1688
             $tcpConnection.Connect($ip, 1688)
             if ($tcpConnection.Connected) {
-                Add-Content -Path $outputFile -Value "kms.jihuowin.com.	1	IN	A	$ipAddress"
+                # Add-Content -Path $outputFile -Value "kms.jihuowin.com.	1	IN	A	$ipAddress"
+                Add-Content -Path $outputFile -Value "$ipAddress"
                 Write-Host "===> Success: $ipAddress :1688"
             }
         } catch {
