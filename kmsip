@@ -9,6 +9,7 @@ $outputFile = Join-Path -Path $currentPath -ChildPath "outip_list.txt"
 Write-Host "`n===> Input file: $inputFile"
 Write-Host "===> Output file: $outputFile"
 Write-Host "===> Please confirm the paths and press any key to continue..."
+Write-Host "Note: Please disable VPN, system proxy, and virtual network adapters.`n"
 [System.Console]::ReadKey() > $null
 
 # 检查输入文件是否存在
