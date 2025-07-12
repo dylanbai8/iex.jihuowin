@@ -6,29 +6,36 @@ $inputFile = Join-Path -Path $currentPath -ChildPath "domain.txt"
 $outputFile = Join-Path -Path $currentPath -ChildPath "cloudflare_import.txt"
 
 # 提示信息
-Write-Host "`n===> Domain list: $inputFile"
-Write-Host "===> Output file: $outputFile"
-Write-Host "===> Confirm the path and press any key ..."
+Write-Host "`n===> 输入文件: $inputFile"
+Write-Host "===> 输出文件: $outputFile"
+Write-Host "===> 请确认路径，按任意键继续 ..."
 [System.Console]::ReadKey() > $null
 
-# 检查域名文件是否存在
+# 检查输入文件是否存在
 if (-not (Test-Path -Path $inputFile)) {
-    Write-Host "===> Error! File not found: $inputFile"
+    Write-Host "===> 错误：输入文件不存在！请检查 $inputFile"
     return
 }
 
-# 读取域名列表
-$domains = Get-Content -Path $inputFile
+# 如果输出文件不存在，自动创建
+if (-not (Test-Path -Path $outputFile)) {
+    Write-Host "===> 输出文件不存在，正在创建: $outputFile"
+    New-Item -ItemType File -Path $outputFile -Force | Out-Null
+}
 
 # 清空输出文件内容
 Clear-Content -Path $outputFile -ErrorAction SilentlyContinue
 
+# 读取域名列表
+$domains = Get-Content -Path $inputFile
+
 # 遍历每个域名
 foreach ($domain in $domains) {
     try {
+        # 获取域名的 IPv4 地址
         $ipAddresses = [System.Net.Dns]::GetHostAddresses($domain) | Where-Object { $_.AddressFamily -eq 'InterNetwork' }
     } catch {
-        Write-Host "===> DNS Parse Error: $domain"
+        Write-Host "===> 域名解析失败: $domain"
         continue
     }
 
@@ -36,18 +43,19 @@ foreach ($domain in $domains) {
         $ipAddress = $ip.ToString()
         $tcpConnection = New-Object System.Net.Sockets.TcpClient
         try {
+            # 尝试连接 1688 端口
             $tcpConnection.Connect($ip, 1688)
             if ($tcpConnection.Connected) {
+                # 写入 Cloudflare 导入格式
                 Add-Content -Path $outputFile -Value "kms.jihuowin.com.	1	IN	A	$ipAddress"
-                Write-Host "===> Working: $ipAddress :1688"
+                Write-Host "===> 成功: $ipAddress :1688"
             }
         } catch {
-            Write-Host "===> Unreachable: $ipAddress :1688"
+            Write-Host "===> 端口不可达: $ipAddress :1688"
         } finally {
             $tcpConnection.Close()
         }
     }
 }
 
-Write-Host "`n===> All done."
-Write-Host "===> Output saved: $outputFile"
+Write-Host "`n===> 执行完毕！结果已保存到：$outputFile"
