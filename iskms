@@ -1,5 +1,13 @@
-$output = & cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv
-$content = $output -join "`n"
+# 获取 slmgr.vbs 输出到文件
+$tmpFile = "$env:TEMP\slmgr_output.txt"
+cmd /c "cscript.exe //nologo C:\Windows\System32\slmgr.vbs /dlv > `"$tmpFile`""
+
+# 读取并清除不可见字符
+$content = Get-Content $tmpFile -Encoding Default -Raw
+$content = $content -replace '[\u200E\u200F\uFEFF]', ''
+
+# 删除临时文件
+Remove-Item $tmpFile -Force
 
 # ========= 1. Check for VOL (Volume License) =========
 # Just check if "VOLUME" appears anywhere
