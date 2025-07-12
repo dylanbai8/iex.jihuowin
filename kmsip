@@ -33,7 +33,15 @@ $domains = Get-Content -Path $inputFile
 foreach ($domain in $domains) {
     try {
         # Resolve IPv4 addresses only
-        $ipAddresses = [System.Net.Dns]::GetHostAddresses($domain) | Where-Object { $_.AddressFamily -eq 'InterNetwork' }
+try {
+    # Resolve A records (IPv4 only) using Google DNS
+    $ipRecords = Resolve-DnsName -Name $domain -Type A -Server 8.8.8.8 -ErrorAction Stop
+    $ipAddresses = $ipRecords | Select-Object -ExpandProperty IPAddress
+} catch {
+    Write-Host "===> DNS resolution failed: $domain"
+    continue
+}
+
     } catch {
         Write-Host "===> DNS resolution failed: $domain"
         continue
