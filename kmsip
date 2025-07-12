@@ -1,46 +1,43 @@
-# 设置输出编码为 UTF-8
+# Set UTF-8 encoding for console output (optional)
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-Write-Host "===> 中文测试：路径确认成功"
-
-# 获取当前路径
+# Get current path
 $currentPath = (Get-Location).Path
-# 输入文件路径
+# Input and output file paths
 $inputFile = Join-Path -Path $currentPath -ChildPath "domain.txt"
-# 输出文件路径
 $outputFile = Join-Path -Path $currentPath -ChildPath "cloudflare_import.txt"
 
-# 提示信息
-Write-Host "`n===> 输入文件: $inputFile"
-Write-Host "===> 输出文件: $outputFile"
-Write-Host "===> 请确认路径，按任意键继续 ..."
+# Prompt
+Write-Host "`n===> Input file: $inputFile"
+Write-Host "===> Output file: $outputFile"
+Write-Host "===> Please confirm the paths and press any key to continue..."
 [System.Console]::ReadKey() > $null
 
-# 检查输入文件是否存在
+# Check if input file exists
 if (-not (Test-Path -Path $inputFile)) {
-    Write-Host "===> 错误：输入文件不存在！请检查 $inputFile"
+    Write-Host "===> Error: Input file not found: $inputFile"
     return
 }
 
-# 如果输出文件不存在，自动创建
+# Create output file if it doesn't exist
 if (-not (Test-Path -Path $outputFile)) {
-    Write-Host "===> 输出文件不存在，正在创建: $outputFile"
+    Write-Host "===> Output file not found. Creating new file: $outputFile"
     New-Item -ItemType File -Path $outputFile -Force | Out-Null
 }
 
-# 清空输出文件内容
+# Clear output file content
 Clear-Content -Path $outputFile -ErrorAction SilentlyContinue
 
-# 读取域名列表
+# Read domain list
 $domains = Get-Content -Path $inputFile
 
-# 遍历每个域名
+# Process each domain
 foreach ($domain in $domains) {
     try {
-        # 获取域名的 IPv4 地址
+        # Resolve IPv4 addresses only
         $ipAddresses = [System.Net.Dns]::GetHostAddresses($domain) | Where-Object { $_.AddressFamily -eq 'InterNetwork' }
     } catch {
-        Write-Host "===> 域名解析失败: $domain"
+        Write-Host "===> DNS resolution failed: $domain"
         continue
     }
 
@@ -48,19 +45,19 @@ foreach ($domain in $domains) {
         $ipAddress = $ip.ToString()
         $tcpConnection = New-Object System.Net.Sockets.TcpClient
         try {
-            # 尝试连接 1688 端口
+            # Attempt to connect to port 1688
             $tcpConnection.Connect($ip, 1688)
             if ($tcpConnection.Connected) {
-                # 写入 Cloudflare 导入格式
                 Add-Content -Path $outputFile -Value "kms.jihuowin.com.	1	IN	A	$ipAddress"
-                Write-Host "===> 成功: $ipAddress :1688"
+                Write-Host "===> Success: $ipAddress :1688"
             }
         } catch {
-            Write-Host "===> 端口不可达: $ipAddress :1688"
+            Write-Host "===> Unreachable: $ipAddress :1688"
         } finally {
             $tcpConnection.Close()
         }
     }
 }
 
-Write-Host "`n===> 执行完毕！结果已保存到：$outputFile"
+Write-Host "`n===> Completed."
+Write-Host "===> Output saved to: $outputFile"
