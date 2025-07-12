@@ -82,5 +82,9 @@ foreach ($domain in $domains) {
     }
 }
 
+# 对输出文件中的 IP 去重
+$uniqueIPs = Get-Content -Path $outputFile | Sort-Object -Unique
+Set-Content -Path $outputFile -Value $uniqueIPs
+
 Write-Host "`n===> Completed."
 Write-Host "===> Output saved to: $outputFile"
